@@ -9,23 +9,16 @@ var outputFile = args[3];
 var outputFormat = args[4];
 var port = parseInt(args[5]);
 var page = webPage.create();
+page.settings.localToRemoteUrlAccessEnabled = true;
 
-var indexPath = fs.absolute(path + '/node_modules/morpheus-app/index.html');
-if (!fs.exists(indexPath)) {
-  console.log('Unable to load Morpheus: ' + indexPath);
-  phantom.exit();
-}
 if (port > 0) {
   var listening = server.listen(port, function (request, response) {
-    var path = request.url.substring(1);
+    var index = request.url.indexOf('path=');
+    var path = request.url.substring(index + 'path='.length);
     path = path.replace(/[\\\/]/g, fs.separator);
     if (!fs.exists(path) || !fs.isFile(path)) {
       console.log(path + ' not found');
       phantom.exit();
-      // response.statusCode = 404;
-      // response.write('<html><head></head><body><h1>File Not Found</h1><h2>File:' + path + '</h2></body></html>');
-      // response.close();
-      // return;
     }
 
     response.statusCode = 200;
@@ -42,35 +35,44 @@ page.onConsoleMessage = function (msg) {
   console.log(msg);
 };
 
-var ignoreUrls = [
-  'https://www.dropbox.com/static/api/2/dropins.js', 'https://apis.google.com/js/api.js', 'https://www.google-analytics.com/analytics.js',
-  'https://s3.amazonaws.com/data.clue.io/morpheus/tcga/tcga_index.txt'];
-page.onResourceRequested = function (requestData, networkRequest) {
-  // redirect file system requests
-  if (requestData.url.substring(0, 8) !== 'https://' && requestData.url.substring(0, 7) !== 'http://' && requestData.url.substring(0, 7) !== 'file://') {
-    var newUrl = 'http://localhost:' + port + '/' + requestData.url;
-    networkRequest.changeUrl(newUrl);
-  } else {
-    for (var i = 0; i < ignoreUrls.length; i++) {
-      if (requestData.url === ignoreUrls[i]) {
-        networkRequest.abort();
-        break;
-      }
-    }
-  }
+page.onCallback = function (binaryStr) {
+  // save the image to disk
+  var out = fs.open(outputFile, 'wb');
+  out.write(binaryStr);
+  out.close();
+  phantom.exit();
 };
 
-page.injectJs(fs.absolute(path + '/node_modules/morpheus-app/js/morpheus-external-latest.min.js'));
-page.injectJs(fs.absolute(path + '/node_modules/morpheus-app/js/morpheus-latest.min.js'));
+// var content = [
+//   '<html>',
+//   '<head>',
+//   '<meta http-equiv="Content-Type" content="text/html;charset=utf-8">',
+//   '<meta http-equiv="X-UA-Compatible" content="IE=edge">',
+//   '<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">',
+//   '</head>',
+//   '<body>',
+//   '</body>',
+//   '</html>'];
+// page.content = content.join('\n');
 
+function injectJSString(script) {
+  page.evaluate(function (js) {
+    var script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.innerHTML = js;
+    document.head.appendChild(script);
+  }, script);
+};
+var extJsPath = fs.absolute(path + '/node_modules/morpheus-app/js/morpheus-external-latest.min.js');
+if (!fs.exists(extJsPath)) {
+  console.log('Unable to find Morpheus JavaScript');
+  phantom.exit();
+}
+injectJSString(fs.read(extJsPath));
+injectJSString(fs.read(fs.absolute(path + '/node_modules/morpheus-app/js/morpheus.js')));
 var createImage = function () {
-
-  // page.open(indexPath, function (status) {
-  // if (status !== 'success') {
-  //   console.log('Unable to load Morpheus.');
-  //   phantom.exit();
-  // }
   page.evaluate(function (data) {
+    morpheus.Util.TRACKING_ENABLED = false;
     var options = data.options;
     options.interactive = false;
     options.loadedCallback = function (heatMap) {
@@ -85,14 +87,6 @@ var createImage = function () {
     };
     new morpheus.HeatMap(options);
   }, {outputFormat: outputFormat, options: options});
-  page.onCallback = function (binaryStr) {
-    // save the image to disk
-    var out = fs.open(outputFile, 'wb');
-    out.write(binaryStr);
-    out.close();
-    phantom.exit();
-  };
-  // });
 };
 
 if (fs.exists(options)) {
@@ -102,6 +96,33 @@ if (fs.exists(options)) {
   options = JSON.parse(options.trim());
 }
 
+// convert file paths to URLs
+
+function convertFilePathToUrl(value) {
+  if (value != null) {
+    value = fs.absolute(value);
+    if (fs.exists(value) && fs.isFile(value)) {
+      return 'http://localhost:' + port + '/?path=' + value;
+    }
+  }
+  return value;
+};
+
+if (port > 0) {
+  options.dataset = convertFilePathToUrl(options.dataset);
+  options.rowDendrogram = convertFilePathToUrl(options.rowDendrogram);
+  options.columnDendrogram = convertFilePathToUrl(options.columnDendrogram);
+  if (options.columnAnnotations) {
+    for (var i = 0; i < options.columnAnnotations.length; i++) {
+      options.columnAnnotations[i].file = convertFilePathToUrl(options.columnAnnotations[i].file);
+    }
+  }
+  if (options.rowAnnotations) {
+    for (var i = 0; i < options.rowAnnotations.length; i++) {
+      options.rowAnnotations[i].file = convertFilePathToUrl(options.rowAnnotations[i].file);
+    }
+  }
+}
 createImage();
 
 
