@@ -59,6 +59,10 @@ page.onResourceRequested = function (requestData, networkRequest) {
 
 var createImage = function () {
   page.open(indexPath, function (status) {
+    if (status !== 'success') {
+      console.log('Unable to load Morpheus.');
+      phantom.exit();
+    }
     page.evaluate(function (data) {
       var options = data.options;
       options.interactive = false;
