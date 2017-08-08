@@ -36,7 +36,8 @@ if (commandArgs.help || commandArgs.input == null || commandArgs.output == null)
   process.exit();
 }
 
-var program = phantomjs.exec(path.join(__dirname + path.sep + 'morpheus-phantom.js'), path.normalize(__dirname + path.sep + '..'), commandArgs.input, commandArgs.output,
+var program = phantomjs.exec('--web-security=no', path.join(__dirname + path.sep + 'morpheus-phantom.js'), path.normalize(__dirname + path.sep + '..'), commandArgs.input,
+    commandArgs.output,
     commandArgs.format,
     commandArgs.port);
 program.stdout.pipe(process.stdout);

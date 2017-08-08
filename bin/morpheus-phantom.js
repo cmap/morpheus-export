@@ -9,8 +9,7 @@ var outputFile = args[3];
 var outputFormat = args[4];
 var port = parseInt(args[5]);
 var page = webPage.create();
-page.settings.localToRemoteUrlAccessEnabled = true;
-page.settings.webSecurityEnabled = false;
+
 var indexPath = fs.absolute(path + '/node_modules/morpheus-app/index.html');
 if (!fs.exists(indexPath)) {
   console.log('Unable to load Morpheus: ' + indexPath);
@@ -61,35 +60,39 @@ page.onResourceRequested = function (requestData, networkRequest) {
   }
 };
 
+page.injectJs(fs.absolute(path + '/node_modules/morpheus-app/js/morpheus-external-latest.min.js'));
+page.injectJs(fs.absolute(path + '/node_modules/morpheus-app/js/morpheus-latest.min.js'));
+
 var createImage = function () {
-  page.open(indexPath, function (status) {
-    if (status !== 'success') {
-      console.log('Unable to load Morpheus.');
-      phantom.exit();
-    }
-    page.evaluate(function (data) {
-      var options = data.options;
-      options.interactive = false;
-      options.loadedCallback = function (heatMap) {
-        window.saveAs = function (blob) {
-          var reader = new FileReader();
-          reader.onloadend = function () {
-            window.callPhantom(reader.result);
-          };
-          reader.readAsBinaryString(blob);
+
+  // page.open(indexPath, function (status) {
+  // if (status !== 'success') {
+  //   console.log('Unable to load Morpheus.');
+  //   phantom.exit();
+  // }
+  page.evaluate(function (data) {
+    var options = data.options;
+    options.interactive = false;
+    options.loadedCallback = function (heatMap) {
+      window.saveAs = function (blob) {
+        var reader = new FileReader();
+        reader.onloadend = function () {
+          window.callPhantom(reader.result);
         };
-        heatMap.saveImage('tmp', data.outputFormat);
+        reader.readAsBinaryString(blob);
       };
-      new morpheus.HeatMap(options);
-    }, {outputFormat: outputFormat, options: options});
-    page.onCallback = function (binaryStr) {
-      // save the image to disk
-      var out = fs.open(outputFile, 'wb');
-      out.write(binaryStr);
-      out.close();
-      phantom.exit();
+      heatMap.saveImage('tmp', data.outputFormat);
     };
-  });
+    new morpheus.HeatMap(options);
+  }, {outputFormat: outputFormat, options: options});
+  page.onCallback = function (binaryStr) {
+    // save the image to disk
+    var out = fs.open(outputFile, 'wb');
+    out.write(binaryStr);
+    out.close();
+    phantom.exit();
+  };
+  // });
 };
 
 if (fs.exists(options)) {
