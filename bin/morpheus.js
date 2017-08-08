@@ -9,7 +9,7 @@ var optionDefinitions = [
   {name: 'output', alias: 'o', type: String, description: 'output file'},
   {name: 'format', alias: 'f', type: String, defaultValue: 'png', description: 'output file format (png or svg)'},
   {name: 'port', type: Number, description: 'web server port', defaultValue: 9222},
-  {name: 'help', alias: 'f', type: Boolean, description: 'print this usage guide'}
+  {name: 'help', alias: 'h', type: Boolean, description: 'print this usage guide'}
 ];
 
 var commandArgs = commandLineArgs(optionDefinitions);
