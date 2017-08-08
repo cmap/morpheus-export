@@ -26,7 +26,8 @@ ln -s `which nodejs` /usr/bin/node
 
 ## Running
     
-    morpheus-export <arguments>
+    morpheus-export --help
+to see a list of options
 
 
 ## License
