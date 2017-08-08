@@ -12,6 +12,10 @@ var page = webPage.create();
 page.settings.localToRemoteUrlAccessEnabled = true;
 page.settings.webSecurityEnabled = false;
 var indexPath = fs.absolute(path + '/node_modules/morpheus-app/index.html');
+if (!fs.exists(indexPath)) {
+  console.log('Unable to load Morpheus: ' + indexPath);
+  phantom.exit();
+}
 if (port > 0) {
   var listening = server.listen(port, function (request, response) {
     var path = request.url.substring(1);
