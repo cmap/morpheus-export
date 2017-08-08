@@ -39,11 +39,21 @@ page.onConsoleMessage = function (msg) {
   console.log(msg);
 };
 
+var ignoreUrls = [
+  'https://www.dropbox.com/static/api/2/dropins.js', 'https://apis.google.com/js/api.js', 'https://www.google-analytics.com/analytics.js',
+  'https://s3.amazonaws.com/data.clue.io/morpheus/tcga/tcga_index.txt'];
 page.onResourceRequested = function (requestData, networkRequest) {
   // redirect file system requests
   if (requestData.url.substring(0, 8) !== 'https://' && requestData.url.substring(0, 7) !== 'http://' && requestData.url.substring(0, 7) !== 'file://') {
     var newUrl = 'http://localhost:' + port + '/' + requestData.url;
     networkRequest.changeUrl(newUrl);
+  } else {
+    for (var i = 0; i < ignoreUrls.length; i++) {
+      if (requestData.url === ignoreUrls[i]) {
+        networkRequest.abort();
+        break;
+      }
+    }
   }
 };
 
