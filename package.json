@@ -1,0 +1,38 @@
+{
+  "name": "morpheus-export",
+  "description": "export static heat maps using Morpheus.js",
+  "license": "BSD-3-Clause",
+  "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cmap/morpheus-export.git"
+  },
+  "homepage": "https://cmap.github.io/morpheus-export/",
+  "bugs": {
+    "url": "https://github.com/cmap/morpheus-export/issues"
+  },
+  "author": {
+    "name": "Joshua Gould"
+  },
+  "keywords": [
+    "graphing",
+    "plotting",
+    "data",
+    "matrix",
+    "heatmap",
+    "heat map",
+    "visualization",
+    "morpheus.js",
+    "morpheus"
+  ],
+  "bin": {
+    "morpheus-export": "bin/morpheus.js"
+  },
+  "scripts": {},
+  "dependencies": {
+    "command-line-args": "^4.0.6",
+    "command-line-usage": "^4.0.0",
+    "morpheus-app": "^1.0.0",
+    "phantomjs-prebuilt": "^2.1.14"
+  }
+}
