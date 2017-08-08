@@ -6,13 +6,20 @@ var path = require('path');
 var phantomjs = require('phantomjs-prebuilt');
 var optionDefinitions = [
   {name: 'input', alias: 'i', type: String, description: 'JSON configuration (https://software.broadinstitute.org/morpheus/configuration.html)'},
-  {name: 'output', alias: 'o', type: String, description: 'output file'},
-  {name: 'format', alias: 'f', type: String, defaultValue: 'png', description: 'output file format (png or svg)'},
-  {name: 'port', type: Number, description: 'web server port', defaultValue: 9222},
-  {name: 'help', alias: 'h', type: Boolean, description: 'print this usage guide'}
+  {name: 'output', alias: 'o', type: String, description: 'output image file'},
+  {name: 'format', alias: 'f', type: String, defaultValue: 'png', description: 'output file format (png or svg, default is png)'},
+  {name: 'help', alias: 'h', type: Boolean, description: 'print this usage guide'},
+  {name: 'port', type: Number, description: 'web server port (default is 9222)', defaultValue: 9222}
 ];
 
-var commandArgs = commandLineArgs(optionDefinitions);
+var commandArgs;
+try {
+  commandArgs = commandLineArgs(optionDefinitions);
+} catch (x) {
+  console.log('' + x);
+  console.log(usage);
+  process.exit();
+}
 
 var usage = getUsage([
   {
@@ -34,9 +41,6 @@ var program = phantomjs.exec(path.join(__dirname + path.sep + 'morpheus-phantom.
     commandArgs.port);
 program.stdout.pipe(process.stdout);
 program.stderr.pipe(process.stderr);
-// program.on('exit', code = > {
-//   process.exit();
-// })
 
 
 
