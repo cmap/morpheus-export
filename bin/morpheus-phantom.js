@@ -18,10 +18,11 @@ if (port > 0) {
     path = path.replace(/[\\\/]/g, fs.separator);
     if (!fs.exists(path) || !fs.isFile(path)) {
       console.log(path + ' not found');
-      response.statusCode = 404;
-      response.write('<html><head></head><body><h1>File Not Found</h1><h2>File:' + path + '</h2></body></html>');
-      response.close();
-      return;
+      phantom.exit();
+      // response.statusCode = 404;
+      // response.write('<html><head></head><body><h1>File Not Found</h1><h2>File:' + path + '</h2></body></html>');
+      // response.close();
+      // return;
     }
 
     response.statusCode = 200;
