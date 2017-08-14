@@ -9,7 +9,8 @@ exports.saveImage = function (options, outputFile, outputFormat) {
   $ = require('../node_modules/morpheus-app/js/jquery-2.2.4.min.js')(dom.window);
   _ = require('../node_modules/morpheus-app/js/underscore-min.js');
   d3 = require('../node_modules/morpheus-app/js/d3.min.js');
-  const morpheus = require('../node_modules/morpheus-app/js/morpheus-latest.min.js');
+  colorbrewer = require('../node_modules/morpheus-app/js/colorbrewer.js').colorbrewer;
+  const morpheus = require('../node_modules/morpheus-app/js/morpheus.js');
   const nodeFetch = require('node-fetch');
   Response = nodeFetch.Response;
   Headers = nodeFetch.Headers;
@@ -19,10 +20,11 @@ exports.saveImage = function (options, outputFile, outputFormat) {
     const request = new Request(url, options);
     if (request.url.substring(0, 5) === 'file:') {
       return new Promise((resolve, reject) => {
-        const filePath = path.normalize(url.substring('file:///'.length));
+        const filePath = path.resolve(url.substring('file://'.length));
         if (!fs.existsSync(filePath)) {
           reject(`File not found: ${filePath}`);
         }
+
         const readStream = fs.createReadStream(filePath);
         readStream.on('open', function () {
           resolve(new Response(readStream, {

@@ -61,19 +61,22 @@ if (!endsWith(commandArgs.output.toLowerCase(), '.' + commandArgs.format)) {
   commandArgs.output += '.' + commandArgs.format;
 }
 
-function convertFilePathToUrl(value) {
-  if (value != null) {
-    value = path.normalize(value);
-    if (fs.existsSync(value)) {
-      var pathName = path.resolve(value).replace(/\\/g, '/');
+function convertFilePathToUrl(pathName) {
+  if (pathName != null) {
+    pathName = path.resolve(pathName);
+    if (fs.existsSync(pathName)) {
+      pathName = pathName.replace(/\\/g, '/');
       // Windows drive letter must be prefixed with a slash
       if (pathName[0] !== '/') {
         pathName = '/' + pathName;
       }
-      return encodeURI('file://' + pathName);
+
+      // Escape required characters for path components
+      // See: https://tools.ietf.org/html/rfc3986#section-3.3
+      return encodeURI('file://' + pathName).replace(/[?#]/g, encodeURIComponent);
     }
   }
-  return value;
+  return pathName;
 };
 
 var options;
