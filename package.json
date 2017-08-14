@@ -30,9 +30,12 @@
   },
   "scripts": {},
   "dependencies": {
+    "canvas-prebuilt": "^1.6.5-prerelease.1",
     "command-line-args": "^4.0.6",
     "command-line-usage": "^4.0.0",
-    "morpheus-app": "^1.0.0",
-    "phantomjs-prebuilt": "^2.1.14"
-  }
+    "jsdom": "^11.1.0",
+    "morpheus-app": "^1.0.1",
+    "node-fetch": "^2.0.0-alpha.8"
+  },
+  "devDependencies": {}
 }
