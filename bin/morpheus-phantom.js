@@ -43,18 +43,6 @@ page.onCallback = function (binaryStr) {
   phantom.exit();
 };
 
-// var content = [
-//   '<html>',
-//   '<head>',
-//   '<meta http-equiv="Content-Type" content="text/html;charset=utf-8">',
-//   '<meta http-equiv="X-UA-Compatible" content="IE=edge">',
-//   '<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">',
-//   '</head>',
-//   '<body>',
-//   '</body>',
-//   '</html>'];
-// page.content = content.join('\n');
-
 function injectJSString(script) {
   page.evaluate(function (js) {
     var script = document.createElement('script');
@@ -70,11 +58,17 @@ if (!fs.exists(extJsPath)) {
 }
 injectJSString(fs.read(extJsPath));
 injectJSString(fs.read(fs.absolute(path + '/node_modules/morpheus-app/js/morpheus.js')));
+injectJSString(fs.read(fs.absolute(path + '/node_modules/whatwg-fetch/fetch.js')));
+injectJSString(fs.read(fs.absolute(path + '/node_modules/promise-polyfill/promise.js')));
 var createImage = function () {
   page.evaluate(function (data) {
     morpheus.Util.TRACKING_ENABLED = false;
     var options = data.options;
     options.interactive = false;
+    options.error = function (err) {
+      console.log('Error creating heat map', err);
+      phantom.exit();
+    };
     options.loadedCallback = function (heatMap) {
       window.saveAs = function (blob) {
         var reader = new FileReader();
@@ -96,8 +90,7 @@ if (fs.exists(options)) {
   options = JSON.parse(options.trim());
 }
 
-// convert file paths to URLs
-
+// convert file URLS to localhost URLs
 function convertFilePathToUrl(value) {
   if (value != null) {
     value = fs.absolute(value);
