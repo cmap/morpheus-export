@@ -48,7 +48,7 @@ if (commandArgs.output == null) {
 }
 if (commandArgs.format == null) {
   // infer format from file extension
-  var formats = ['png', 'svg'];
+  var formats = ['pdf', 'png', 'svg'];
   for (var i = 0; i < formats.length; i++) {
     if (endsWith(commandArgs.output.toLowerCase(), '.' + formats[i])) {
       commandArgs.format = formats[i];
