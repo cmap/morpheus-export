@@ -36,9 +36,12 @@ page.onConsoleMessage = function (msg) {
 };
 
 page.onCallback = function (binaryStr) {
-  // save the image to disk
   var out = fs.open(outputFile, 'wb');
-  out.write(binaryStr);
+  if (outputFormat === 'png') {
+    out.write(atob(binaryStr.substring('data:image/png;base64,'.length)));
+  } else {
+    out.write(binaryStr);
+  }
   out.close();
   phantom.exit();
 };
@@ -77,7 +80,26 @@ var createImage = function () {
         };
         reader.readAsBinaryString(blob);
       };
-      heatMap.saveImage('tmp', data.outputFormat);
+      if (data.outputFormat === 'png') {
+        var bounds = heatMap.getTotalSize();
+        var canvas = $('<canvas></canvas>')[0];
+        var height = bounds.height;
+        var width = bounds.width;
+        var backingScale = morpheus.CanvasUtil.BACKING_SCALE;
+        canvas.height = backingScale * height;
+        canvas.style.height = height + 'px';
+        canvas.width = backingScale * width;
+        canvas.style.width = width + 'px';
+        var context = canvas.getContext('2d');
+        morpheus.CanvasUtil.resetTransform(context);
+        heatMap.snapshot(context);
+        var base64 = canvas.toDataURL('image/png', 0);
+        window.callPhantom(base64);
+        // images created using toBlob are huge in PhantomJS
+      } else {
+        heatMap.saveImage('tmp', data.outputFormat);
+      }
+
     };
     new morpheus.HeatMap(options);
   }, {outputFormat: outputFormat, options: options});

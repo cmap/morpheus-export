@@ -9,7 +9,7 @@ var optionDefinitions = [
   {name: 'input', alias: 'i', type: String, description: 'JSON configuration (https://software.broadinstitute.org/morpheus/configuration.html)'},
   {name: 'output', alias: 'o', type: String, description: 'output image file'},
   {name: 'format', alias: 'f', type: String, description: 'output file format (pdf, png, svg)'},
-  {name: 'port', type: Number, description: 'Port for temporary web server for reading local files using PhantomJS', defaultValue: 9432},
+  {name: 'port', type: Number, description: 'port for temporary web server for reading local files using PhantomJS', defaultValue: 9432},
   {name: 'help', alias: 'h', type: Boolean, description: 'print this usage guide'}
 ];
 
