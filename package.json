@@ -26,15 +26,15 @@
     "morpheus"
   ],
   "bin": {
-    "morpheus-export": "bin/morpheus.js"
+    "morpheus-export": "morpheus.js"
   },
   "scripts": {},
   "dependencies": {
     "command-line-args": "^4.0.6",
     "command-line-usage": "^4.0.0",
-    "morpheus-app": "^1.0.4",
-    "phantomjs-prebuilt": "^2.1.15",
-    "promise-polyfill": "^6.0.2",
-    "whatwg-fetch": "^2.0.3"
+    "hdf5": "^0.3.3",
+    "http": "0.0.0",
+    "morpheus-app": "^1.0.10",
+    "nightmare": "^3.0.0"
   }
 }
