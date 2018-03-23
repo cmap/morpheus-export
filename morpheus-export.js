@@ -8,6 +8,9 @@ var fs = require('fs')
 const Nightmare = require('nightmare')
 const nightmare = Nightmare({
   show: false,
+  webPreferences: {
+    nodeIntegration: true,
+  },
 })
 var optionDefinitions = [
   {
@@ -158,7 +161,7 @@ var createImage = function () {
         morpheus.Util.TRACKING_ENABLED = false
         options.interactive = false
         options.error = function (err) {
-          reject(err)
+          reject('is node ' + morpheus.Util.isNode())
         }
         options.loadedCallback = function (heatMap) {
           window.saveAs = function (blob) {
@@ -216,6 +219,7 @@ function convertFilePathToUrl (value) {
     value = path.normalize(value)
     if (fs.existsSync(value)) {
       return 'http://localhost:' + port + '/?path=' + value
+      //return 'file://' + value
     }
     return value
   }
