@@ -8,7 +8,7 @@ var fs = require('fs')
 const Nightmare = require('nightmare')
 const nightmare = Nightmare({
   show: false,
-});
+})
 var optionDefinitions = [
   {
     name: 'input',
@@ -158,7 +158,7 @@ var createImage = function () {
         morpheus.Util.TRACKING_ENABLED = false
         options.interactive = false
         options.error = function (err) {
-          reject('Error saving heatmap')
+          reject(err)
         }
         options.loadedCallback = function (heatMap) {
           window.saveAs = function (blob) {
@@ -197,7 +197,7 @@ var createImage = function () {
       fs.writeFileSync(outputFile, value, 'binary')
       process.exit(0)
     }).catch(function (err) {
-    console.log('Error')
+    console.log('Error saving heat map.')
     console.log(err)
     process.exit(1)
   })
