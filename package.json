@@ -1,6 +1,6 @@
 {
   "name": "morpheus-export",
-  "description": "export static heat maps using Morpheus.js",
+  "description": "Export static heat maps using Morpheus.js",
   "license": "BSD-3-Clause",
   "version": "1.0.7",
   "repository": {
@@ -17,6 +17,8 @@
   "keywords": [
     "graphing",
     "plotting",
+    "plot",
+    "chart",
     "data",
     "matrix",
     "heatmap",
@@ -26,7 +28,7 @@
     "morpheus"
   ],
   "bin": {
-    "morpheus-export": "morpheus.js"
+    "morpheus-export": "morpheus-export.js"
   },
   "scripts": {},
   "dependencies": {
